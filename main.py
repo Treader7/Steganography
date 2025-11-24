@@ -1,4 +1,4 @@
-from steganography import encode_message, decode_message
+from encode import encode_message, decode_message
 def main():
     # Example image: 4x4 pixels, each pixel is (R, G, B)
     image = [
