@@ -120,4 +120,81 @@ def binary_to_string(binary_str, str):
 
 ### Checksums (Data Integrity) ###
 
-def calculate_chceksum(data)
+def calculate_checksum(data):
+    if isinstance(data, str):
+        data=data.encode('utf-8')
+    elif not isinstance(data,(bytes, bytearray)):
+        raise TypeError("Data must be string or bytes")
+    checksum=0
+    
+    for byte in data:
+        checksum=(checksum+byte) & 0xFFFFFFFF
+    return checksum
+
+def verify_checksum(data, expected_checksum):
+    calculated= calculate_checksum(data)
+    return calculated == expected_checksum
+
+
+
+### Binary String Utilities ###
+def int_to_binary(value, bit_length=32):
+    if value<0:
+        raise ValueError("Cannot convert negative intger to binary")
+    max_value=(1<<bit_length)-1
+    if value>max_value:
+        raise ValueError(f"Value {value} too large for{bit_length} bits")
+    
+    binary=bin(value[2:])
+    return binary.zfill(bit_length)
+
+def binary_to_int(binary_str):
+    if not binary_str:
+        return 0
+    for char in binary_str:
+        if char not in '01':
+            raise ValueError(f"Invalid binary character:'{char}'")
+    return int(binary_str,2)
+
+
+
+### Validatiion Function ###
+def valdiate_bmp_format(bmp_data):
+    if len(bmp_data)<54:
+        return False, "File too small to be a valid BMP"
+    if bmp_data[0:2]!=BMP_SIGNATURE:
+        return False, "Not a BMP file(invalid signature)"
+    
+    try:
+        bit_depth=bytes_to_int(bmp_data, 28, 2, "little")
+        if bit_depth not in Supportted_bit_depth:
+            return False, f"Unsupported bit depth: {bit_depth}"
+    except:
+        return False,"Cannot read bit depth"
+    return True, "Valid BMP format"
+def validate_message_length(message, max_size=max_message_size):
+    if not message:
+        return False,f"Message too long: {len(message)} chars, max{max_size}"
+    return True, "Message Length Valid"
+
+
+
+### Capacity Calculations ###
+def calculate_bmp_capacity(width, height, bit_depth, use_alpha=True):
+    if bit_depth==24:
+        channels=3
+    elif bit_depth==32:
+        channels=4 if use_alpha else 3
+    else:
+        raise ValueError(f"Unsupported bit depth: {bit_depth}")
+    
+    total_pixels=width*height
+    available_bits=total_pixels*channels
+    available_bits-=Header_size_bits
+
+    return max(0, available_bits)
+def calculate_capacity_precentage(message_size_bits, total_capacity_bits, ):
+    if total_capacity_bits==0:
+        return 100.0
+    precentage=(message_size_bits/total_capacity_bits)*100.0
+    return min(100.0, precentage)
