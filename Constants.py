@@ -5,4 +5,4 @@ Supportted_bit_depth = [24, 32] # supported bit depths for BMP files RGB and RGB
 
 MAGIC_NUMBER = 0xAAFF7799 # to identify valid messages this is a signature completly random
 Header_size_bits = 96 # size of the header in bits to know where the header ends and message starts
-max_message_size = 100000000  # 10 MB max message size to prevent excessive memory usage
+max_message_size = 1000000  # 1 MB max message size to prevent excessive memory usage
